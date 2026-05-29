@@ -185,6 +185,10 @@ The system uses **single-character commands** received over UART.
 
 ## Project Visualization
 
+To understand how the data flows from the smartphone application down to the physical hardware, try the live interactive simulator:
+
+👉 **[Launch the TM4C123 Logic Simulator](https://rachitsrivastava2114.github.io/Design-of-a-Smartphone-Controlled-Home-Automation-System-using-Bluetooth-and-Tiva-C/)**
+
 ## Results
 
 - The onboard LEDs responded correctly to the toggle commands.
