@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hardware Architecture Simulator</title>
+    <title>Responsive Hardware Architecture Simulator</title>
     <style>
         :root {
             --bg-color: #f4f6f8;
@@ -14,7 +14,7 @@
             --hc05: #fff2e6;
             --phone: #f2e6ff;
             --relay: #ffe6cc;
-            --active-glow: 0 0 15px rgba(0, 200, 0, 0.8);
+            --active-glow: 0 0 15px rgba(0, 150, 255, 0.8);
         }
 
         body {
@@ -26,10 +26,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden; /* Prevents horizontal scrolling on mobile */
+        }
+
+        h2 {
+            text-align: center;
         }
 
         .controls {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding: 15px;
             background: white;
             border-radius: 8px;
@@ -38,16 +43,21 @@
             gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
         }
 
         button {
-            padding: 10px 15px;
+            padding: 12px 15px; /* Slightly larger padding for touch screens */
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
             color: white;
             transition: transform 0.1s;
+            flex-grow: 1; /* Allows buttons to fill space nicely on mobile */
+            text-align: center;
         }
         button:active { transform: scale(0.95); }
         .btn-red { background: #d32f2f; }
@@ -56,6 +66,7 @@
         .btn-motor { background: #f57c00; }
         .btn-reset { background: #607d8b; }
 
+        /* --- DEFAULT DESKTOP LAYOUT --- */
         .diagram {
             display: grid;
             grid-template-columns: 150px 150px 250px 150px 150px;
@@ -67,6 +78,8 @@
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .node {
@@ -84,7 +97,6 @@
 
         .node small { display: block; font-weight: normal; font-size: 11px; margin-top: 5px; }
 
-        /* Component Placement and Styling */
         #usb-power { grid-column: 2 / 3; grid-row: 1; background: var(--pwr-usb); border-color: #0066cc; }
         #bat-power { grid-column: 4 / 6; grid-row: 1; background: var(--pwr-bat); border-color: #009933; }
         
@@ -96,18 +108,47 @@
         #driver { grid-column: 4 / 5; grid-row: 2; background: var(--relay); border-color: #cc6600; align-self: end; }
         #motor { grid-column: 5 / 6; grid-row: 2; border-radius: 50%; height: 100px; width: 100px; display: flex; align-items: center; justify-content: center; background: #e0e0e0; border-color: #757575;}
         
-        #leds { grid-column: 3 / 4; grid-row: 3; display: flex; gap: 10px; border: none; box-shadow: none; padding: 0;}
+        #leds { grid-column: 3 / 4; grid-row: 3; display: flex; gap: 10px; justify-content: center; border: none; box-shadow: none; padding: 0;}
         .led { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #ddd; background: #eee; transition: all 0.3s; display:flex; align-items:center; justify-content:center; font-size: 10px; font-weight: bold;}
 
         /* Animation Classes */
-        .active-data { box-shadow: 0 0 15px rgba(0, 150, 255, 0.8); transform: scale(1.05); border-color: #0096FF !important;}
+        .active-data { box-shadow: var(--active-glow); transform: scale(1.05); border-color: #0096FF !important;}
         .active-power { box-shadow: 0 0 15px rgba(255, 165, 0, 0.8); }
         .spin { animation: spin 1s linear infinite; background: #ffcc00 !important; border-color: #f57c00 !important;}
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Connectors (Simplified visual cues) */
-        .status-text { text-align: center; margin-top: 20px; font-family: monospace; font-size: 16px; min-height: 24px; color: #555; }
+        .status-text { text-align: center; margin-top: 20px; font-family: monospace; font-size: 16px; min-height: 48px; color: #555; padding: 0 10px;}
+
+        /* --- RESPONSIVE MOBILE/TABLET LAYOUT --- */
+        /* Triggers when the screen is smaller than 1050px */
+        @media (max-width: 1050px) {
+            .diagram {
+                display: flex;
+                flex-direction: column; /* Stack items vertically */
+                align-items: center;
+                width: 100%;
+                max-width: 500px; /* Keeps the list from stretching too wide on tablets */
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .node {
+                width: 100%; /* Make all nodes uniform width */
+                min-height: auto; /* Remove hardcoded heights */
+            }
+
+            #motor {
+                width: 100%;
+                border-radius: 8px; /* Change motor from a circle to a standard box for better mobile fit */
+                height: 80px;
+            }
+            
+            #leds {
+                width: 100%;
+                justify-content: space-evenly;
+            }
+        }
     </style>
 </head>
 <body>
@@ -115,10 +156,10 @@
     <h2>Tiva C Launchpad Hardware Simulator</h2>
     
     <div class="controls">
-        <button class="btn-red" onclick="runSim('red')">Send RED Cmd (PF1)</button>
-        <button class="btn-blue" onclick="runSim('blue')">Send BLUE Cmd (PF2)</button>
-        <button class="btn-green" onclick="runSim('green')">Send GREEN Cmd (PF3)</button>
-        <button class="btn-motor" onclick="runSim('motor')">Send MOTOR Cmd</button>
+        <button class="btn-red" onclick="runSim('red')">RED Cmd (PF1)</button>
+        <button class="btn-blue" onclick="runSim('blue')">BLUE Cmd (PF2)</button>
+        <button class="btn-green" onclick="runSim('green')">GREEN Cmd (PF3)</button>
+        <button class="btn-motor" onclick="runSim('motor')">MOTOR Cmd</button>
         <button class="btn-reset" onclick="resetSim()">System Reset</button>
     </div>
 
@@ -127,8 +168,8 @@
         <div id="bat-power" class="node active-power">Battery 7-12V & Buck<small>Powers Relay & Driver</small></div>
 
         <div id="phone" class="node">Smartphone<small>Bluetooth App</small></div>
-        <div id="hc05" class="node">HC-05 Module<small>TX -> PB0<br>RX <- PB1</small></div>
-        <div id="mcu" class="node">TM4C123GH6PM<br>TIVA C<small>ARM Cortex-M4<br>UART1 & GPIO</small></div>
+        <div id="hc05" class="node">HC-05 Module<small>TX -> PB0 | RX <- PB1</small></div>
+        <div id="mcu" class="node">TM4C123GH6PM TIVA C<small>ARM Cortex-M4 | UART1 & GPIO</small></div>
         
         <div id="relay" class="node">Relay Module<small>GPIO: PB2</small></div>
         <div id="driver" class="node">Motor Driver<small>GPIO: PB3, PB4</small></div>
@@ -147,11 +188,9 @@
         const sleep = ms => new Promise(r => setTimeout(r, ms));
         const statusEl = document.getElementById('status');
 
-        // Keep track of the hardware states
         let state = { red: false, blue: false, green: false, motor: false };
 
         async function runSim(command) {
-            // Animate the signal path
             statusEl.innerText = "Transmitting data via Bluetooth...";
             document.getElementById('phone').classList.add('active-data');
             await sleep(600);
@@ -164,7 +203,6 @@
             document.getElementById('mcu').classList.add('active-data');
             await sleep(600);
 
-            // Toggle logic for the outputs
             if (command === 'red') {
                 state.red = !state.red;
                 const led = document.getElementById('led-red');
@@ -195,16 +233,17 @@
                     statusEl.innerText = "PF2 LOW: Blue LED OFF.";
                 }
             } 
-            // ... (You can apply the same toggle pattern to green)
             else if (command === 'green') {
                 state.green = !state.green;
                 const led = document.getElementById('led-green');
                 if (state.green) {
                     led.style.background = '#00cc00';
                     led.style.boxShadow = '0 0 15px green';
+                    statusEl.innerText = "PF3 HIGH: Green LED ON."
                 } else {
                     led.style.background = '#eee';
                     led.style.boxShadow = 'none';
+                    statusEl.innerText = "PF3 LOW: Green LED OFF."
                 }
             }
             else if (command === 'motor') {
@@ -227,7 +266,6 @@
         }
 
         function resetSim() {
-            // Only used by the "System Reset" button now
             document.querySelectorAll('.active-data, .spin').forEach(el => {
                 el.classList.remove('active-data', 'spin');
             });
