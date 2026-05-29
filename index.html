@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Hardware Architecture Simulator</title>
     <style>
+        /* 1. Bulletproof Box Sizing for all elements */
+        * {
+            box-sizing: border-box;
+        }
+
         :root {
             --bg-color: #f4f6f8;
             --mcu-color: #e6e6ff;
@@ -22,17 +27,19 @@
             background-color: var(--bg-color);
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 3vw; /* Scales with screen size */
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden; /* Prevents horizontal scrolling on mobile */
+            overflow-x: hidden;
         }
 
         h2 {
             text-align: center;
+            font-size: clamp(1.2rem, 3vw, 1.8rem); /* Dynamic font size */
         }
 
+        /* 2. Super Flexible Controls */
         .controls {
             margin-bottom: 20px;
             padding: 15px;
@@ -41,23 +48,23 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Allows buttons to drop to the next line */
             justify-content: center;
             width: 100%;
-            max-width: 800px;
-            box-sizing: border-box;
+            max-width: 900px;
         }
 
         button {
-            padding: 12px 15px; /* Slightly larger padding for touch screens */
+            padding: 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
             color: white;
             transition: transform 0.1s;
-            flex-grow: 1; /* Allows buttons to fill space nicely on mobile */
+            flex: 1 1 140px; /* Grow to fill space, shrink if needed, min-width 140px */
             text-align: center;
+            font-size: clamp(12px, 2vw, 14px);
         }
         button:active { transform: scale(0.95); }
         .btn-red { background: #d32f2f; }
@@ -66,36 +73,35 @@
         .btn-motor { background: #f57c00; }
         .btn-reset { background: #607d8b; }
 
-        /* --- DEFAULT DESKTOP LAYOUT --- */
+        /* --- DESKTOP LAYOUT (Flexible Grid) --- */
         .diagram {
             display: grid;
-            grid-template-columns: 150px 150px 250px 150px 150px;
-            grid-template-rows: auto auto auto;
-            gap: 20px;
+            /* Use fractions (fr) instead of pixels so it squishes perfectly */
+            grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr; 
+            gap: 15px;
             align-items: center;
             justify-items: center;
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            max-width: 100%;
-            box-sizing: border-box;
+            width: 100%;
+            max-width: 1200px; /* Caps out on huge monitors */
         }
 
         .node {
-            padding: 15px;
+            padding: 15px 10px;
             border-radius: 8px;
             border: 2px solid #ccc;
             text-align: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: clamp(11px, 1.2vw, 14px);
             transition: all 0.3s ease;
             width: 100%;
-            box-sizing: border-box;
             background: white;
         }
 
-        .node small { display: block; font-weight: normal; font-size: 11px; margin-top: 5px; }
+        .node small { display: block; font-weight: normal; font-size: 0.85em; margin-top: 5px; }
 
         #usb-power { grid-column: 2 / 3; grid-row: 1; background: var(--pwr-usb); border-color: #0066cc; }
         #bat-power { grid-column: 4 / 6; grid-row: 1; background: var(--pwr-bat); border-color: #009933; }
@@ -106,59 +112,55 @@
         
         #relay { grid-column: 4 / 5; grid-row: 2; background: var(--relay); border-color: #cc6600; align-self: start; }
         #driver { grid-column: 4 / 5; grid-row: 2; background: var(--relay); border-color: #cc6600; align-self: end; }
-        #motor { grid-column: 5 / 6; grid-row: 2; border-radius: 50%; height: 100px; width: 100px; display: flex; align-items: center; justify-content: center; background: #e0e0e0; border-color: #757575;}
+        #motor { grid-column: 5 / 6; grid-row: 2; border-radius: 50%; aspect-ratio: 1; width: 100%; max-width: 120px; display: flex; align-items: center; justify-content: center; background: #e0e0e0; border-color: #757575; font-size: clamp(10px, 1vw, 14px);}
         
         #leds { grid-column: 3 / 4; grid-row: 3; display: flex; gap: 10px; justify-content: center; border: none; box-shadow: none; padding: 0;}
-        .led { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #ddd; background: #eee; transition: all 0.3s; display:flex; align-items:center; justify-content:center; font-size: 10px; font-weight: bold;}
+        .led { flex: 1; aspect-ratio: 1; max-width: 40px; border-radius: 50%; border: 3px solid #ddd; background: #eee; transition: all 0.3s; display:flex; align-items:center; justify-content:center; font-size: 10px; font-weight: bold;}
 
-        /* Animation Classes */
+        /* Animations */
         .active-data { box-shadow: var(--active-glow); transform: scale(1.05); border-color: #0096FF !important;}
         .active-power { box-shadow: 0 0 15px rgba(255, 165, 0, 0.8); }
         .spin { animation: spin 1s linear infinite; background: #ffcc00 !important; border-color: #f57c00 !important;}
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .status-text { text-align: center; margin-top: 20px; font-family: monospace; font-size: 16px; min-height: 48px; color: #555; padding: 0 10px;}
+        .status-text { text-align: center; margin-top: 20px; font-family: monospace; font-size: clamp(12px, 2vw, 16px); min-height: 48px; color: #555; padding: 0 10px; width: 100%;}
 
         /* --- RESPONSIVE MOBILE/TABLET LAYOUT --- */
-        /* Triggers when the screen is smaller than 1050px */
-        @media (max-width: 1050px) {
+        /* Triggers when screen is under 850px wide */
+        @media (max-width: 850px) {
             .diagram {
-                display: flex;
-                flex-direction: column; /* Stack items vertically */
-                align-items: center;
-                width: 100%;
-                max-width: 500px; /* Keeps the list from stretching too wide on tablets */
+                display: flex; /* Swaps from Grid to Flexbox */
+                flex-direction: column; /* Stacks top-to-bottom */
                 padding: 20px;
-                gap: 15px;
             }
 
             .node {
-                width: 100%; /* Make all nodes uniform width */
-                min-height: auto; /* Remove hardcoded heights */
+                min-height: auto; 
+                margin-bottom: 5px; /* Adds spacing between stacked items */
             }
 
             #motor {
-                width: 100%;
-                border-radius: 8px; /* Change motor from a circle to a standard box for better mobile fit */
+                border-radius: 8px; /* Turn circle into standard rounded box for mobile */
+                aspect-ratio: auto;
                 height: 80px;
+                max-width: 100%;
             }
             
-            #leds {
-                width: 100%;
-                justify-content: space-evenly;
+            #mcu {
+                min-height: 100px;
             }
         }
     </style>
 </head>
 <body>
 
-    <h2>Tiva C Launchpad Hardware Simulator</h2>
+    <h2>Tiva C Hardware Simulator</h2>
     
     <div class="controls">
-        <button class="btn-red" onclick="runSim('red')">RED Cmd (PF1)</button>
-        <button class="btn-blue" onclick="runSim('blue')">BLUE Cmd (PF2)</button>
-        <button class="btn-green" onclick="runSim('green')">GREEN Cmd (PF3)</button>
+        <button class="btn-red" onclick="runSim('red')">RED (PF1)</button>
+        <button class="btn-blue" onclick="runSim('blue')">BLUE (PF2)</button>
+        <button class="btn-green" onclick="runSim('green')">GREEN (PF3)</button>
         <button class="btn-motor" onclick="runSim('motor')">MOTOR Cmd</button>
         <button class="btn-reset" onclick="resetSim()">System Reset</button>
     </div>
@@ -187,7 +189,6 @@
     <script>
         const sleep = ms => new Promise(r => setTimeout(r, ms));
         const statusEl = document.getElementById('status');
-
         let state = { red: false, blue: false, green: false, motor: false };
 
         async function runSim(command) {
