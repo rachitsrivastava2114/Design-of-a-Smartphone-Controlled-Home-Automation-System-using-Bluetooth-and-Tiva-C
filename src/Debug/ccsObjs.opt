@@ -1,0 +1,9 @@
+"./gpio.obj"
+"./interrupt.obj"
+"./main.obj"
+"./sysctl.obj"
+"./tm4c123gh6pm_startup_ccs.obj"
+"./uart.obj"
+"../driverlib.lib"
+"../tm4c123gh6pm.cmd"
+-llibc.a
