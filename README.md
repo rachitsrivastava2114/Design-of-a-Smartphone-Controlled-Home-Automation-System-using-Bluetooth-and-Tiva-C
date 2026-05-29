@@ -31,7 +31,6 @@
 - [Pin Configuration](#pin-configuration)
 - [Command Mapping](#command-mapping)
 - [Working Principle](#working-principle)
-- [System Flow](#system-flow)
 - [Software Flow](#software-flow)
 - [Project Visualization](#project-visualization)
 - [Results](#results)
@@ -91,7 +90,7 @@ Based on the received command:
 The relay and motor driver are powered separately for better stability, while the Tiva C board handles logic and control.
 
 <p align="center">
-  <img src="images/system-block-diagram.png" alt="System Block Diagram" width="800">
+  <img src="images/block_diagram.png" alt="System Block Diagram" width="800">
 </p>
 
 ---
@@ -171,11 +170,6 @@ The system uses **single-character commands** received over UART.
 
 ---
 
-## System Flow
-
-<p align="center">
-  <img src="images/block_diagram.png" alt="System Flowchart" width="450">
-</p>
 
 ## Software Flow
 
@@ -191,37 +185,51 @@ The system uses **single-character commands** received over UART.
 
 ## Project Visualization
 
-from graphviz import Digraph
+## Results
 
-def create_system_diagram():
-    # Initialize a new directed graph
-    # format='svg' is great for READMEs because it scales without losing quality
-    dot = Digraph(name='Hardware System', format='svg')
-    
-    # Set global graph attributes (Top-to-Bottom layout, nice font)
-    dot.attr(rankdir='TB', fontname='Helvetica,Arial,sans-serif')
-    dot.attr('node', shape='box', style='rounded, filled', fillcolor='#f8f9fa', fontname='Helvetica')
-    dot.attr('edge', fontname='Helvetica', fontsize='10')
+- The onboard LEDs responded correctly to the toggle commands.
+- The motor operated properly in both forward and reverse directions.
+- The relay successfully switched the motor/load supply.
+- The `X` command worked as an emergency stop by turning OFF all LEDs, stopping the motor, and switching OFF the relay.
+- The interrupt-driven UART design provided fast response without continuous polling.
 
-    # Define the Nodes (The hardware components)
-    dot.node('App', 'Smartphone App\n(Bluetooth Commands)')
-    dot.node('HC05', 'Bluetooth Module\n(HC-05)')
-    dot.node('MCU', 'TM4C123GH6PM\nMicrocontroller', fillcolor='#e2ebf0') # Highlight the MCU
-    dot.node('LED', 'RGB LED')
-    dot.node('Driver', 'Motor Driver')
-    dot.node('Motor', 'DC Motor')
+<p align="center">
+  <img src="images/LED_WORK.png" alt="LED Control Result" width="750">
+</p>
 
-    # Define the Edges (The connections and communication protocols)
-    dot.edge('App', 'HC05', label=' Bluetooth')
-    dot.edge('HC05', 'MCU', label=' UART')
-    dot.edge('MCU', 'LED')
-    dot.edge('MCU', 'Driver')
-    dot.edge('Driver', 'Motor')
+<p align="center">
+  <b>Figure: LED Control Result</b>
+</p>
 
-    # Save and render the file
-    filename = 'hardware_architecture'
-    dot.render(filename, cleanup=True)
-    print(f"Diagram successfully generated as {filename}.svg")
+<p align="center">
+  <img src="images/MOTOR_WORK.png" alt="Motor Control Result" width="750">
+</p>
 
-if __name__ == '__main__':
-    create_system_diagram()
+<p align="center">
+  <b>Figure: Motor Control Result</b>
+</p>
+
+<p align="center">
+  <img src="images/allstop.png" alt="All Stop Result" width="750">
+</p>
+
+<p align="center">
+  <b>Figure: All Stop Result</b>
+</p>
+
+## Applications
+
+Used for smart home automation, wireless appliance control, smart lighting, fan/motor control, assistive technology, IoT prototyping, and embedded systems learning.
+
+## Future Improvements
+
+Future improvements include adding Wi-Fi/IoT control, a custom mobile app, voice control, password protection, multiple relay support, sensor-based automation, LCD status display, and PCB-based hardware design.
+
+## Author
+
+**Rachit Srivastava** <br>
+Bachelor of Technology – Electronics & Communication Engineering
+
+## License
+
+This project is developed for academic and educational purposes only.
