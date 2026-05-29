@@ -2,7 +2,7 @@
 
 <p align="center">
   <a>
-    <img src="images/tiva-c-setup.jpg" alt="Hardware Setup" width="700">
+    <img src="images/tivac.png" alt="Hardware Setup" width="700">
   </a>
 
   <h3 align="center">Embedded Home Automation using Bluetooth and Tiva C</h3>
@@ -12,9 +12,9 @@
     <br />
     <strong>Embedded Systems Design Project</strong>
     <br /><br />
-    <a href="https://github.com/rachitsrivastava2114/YOUR_REPO_NAME/issues">Report Bug</a>
+    <a href="https://github.com/rachitsrivastava2114/Design-of-a-Smartphone-Controlled-Home-Automation-System-using-Bluetooth-and-Tiva-C/issues">Report Bug</a>
     ·
-    <a href="https://github.com/rachitsrivastava2114/YOUR_REPO_NAME">View Project</a>
+    <a href="https://github.com/rachitsrivastava2114/Design-of-a-Smartphone-Controlled-Home-Automation-System-using-Bluetooth-and-Tiva-C">View Project</a>
   </p>
 </p>
 
@@ -31,6 +31,7 @@
 - [Pin Configuration](#pin-configuration)
 - [Command Mapping](#command-mapping)
 - [Working Principle](#working-principle)
+- [System Flow](#system-flow)
 - [Software Flow](#software-flow)
 - [Project Visualization](#project-visualization)
 - [Results](#results)
@@ -170,10 +171,57 @@ The system uses **single-character commands** received over UART.
 
 ---
 
+## System Flow
+
+<p align="center">
+  <img src="images/block_diagram.png" alt="System Flowchart" width="450">
+</p>
+
 ## Software Flow
 
 <p align="center">
-  <img src="images/software-flowchart.png" alt="Software Flowchart" width="450">
+  <img src="images/flow_project.png" alt="Software Flow" width="450">
 </p>
 
 ### Flow Summary
+
+<p align="center">
+  <img src="images/system_flowchart.png" alt="Flow Summary" width="450">
+</p>
+
+## Project Visualization
+
+from graphviz import Digraph
+
+def create_system_diagram():
+    # Initialize a new directed graph
+    # format='svg' is great for READMEs because it scales without losing quality
+    dot = Digraph(name='Hardware System', format='svg')
+    
+    # Set global graph attributes (Top-to-Bottom layout, nice font)
+    dot.attr(rankdir='TB', fontname='Helvetica,Arial,sans-serif')
+    dot.attr('node', shape='box', style='rounded, filled', fillcolor='#f8f9fa', fontname='Helvetica')
+    dot.attr('edge', fontname='Helvetica', fontsize='10')
+
+    # Define the Nodes (The hardware components)
+    dot.node('App', 'Smartphone App\n(Bluetooth Commands)')
+    dot.node('HC05', 'Bluetooth Module\n(HC-05)')
+    dot.node('MCU', 'TM4C123GH6PM\nMicrocontroller', fillcolor='#e2ebf0') # Highlight the MCU
+    dot.node('LED', 'RGB LED')
+    dot.node('Driver', 'Motor Driver')
+    dot.node('Motor', 'DC Motor')
+
+    # Define the Edges (The connections and communication protocols)
+    dot.edge('App', 'HC05', label=' Bluetooth')
+    dot.edge('HC05', 'MCU', label=' UART')
+    dot.edge('MCU', 'LED')
+    dot.edge('MCU', 'Driver')
+    dot.edge('Driver', 'Motor')
+
+    # Save and render the file
+    filename = 'hardware_architecture'
+    dot.render(filename, cleanup=True)
+    print(f"Diagram successfully generated as {filename}.svg")
+
+if __name__ == '__main__':
+    create_system_diagram()
