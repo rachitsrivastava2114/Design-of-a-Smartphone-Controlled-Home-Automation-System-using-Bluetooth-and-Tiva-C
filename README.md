@@ -2,7 +2,7 @@
 
 <p align="center">
   <a>
-    <img src="images/tivac.png" alt="Hardware Setup" width="700">
+    <img src="images/rpi.png" alt="Hardware Setup" width="700">
   </a>
 
   <h3 align="center">Embedded Home Automation using Bluetooth and Tiva C</h3>
